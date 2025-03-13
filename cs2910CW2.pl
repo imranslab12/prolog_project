@@ -61,11 +61,13 @@ senior_citizen(X) :- age_is(X, Age), Age > 75.
 
 %% Find all parents using findall/3
 parents(Parents) :-
-    findall(X, child_of(_, X), AllParents),
-    list_to_set(AllParents, Parents).
+    findall(X, child_of(_, X), Parents).
+
+
 %% Find all parents using setof/3
 parents_set(ParentsSet) :-
-    setof(X, (child_of(_, X), (male(X); female(X))), ParentsSet).
+    findall(X, child_of(_, X), AllParents),
+    list_to_set(AllParents, ParentsSet).
 
 %% TEST: Run the following queries in SWI-Prolog to verify correctness:
 %% ?- father_of(homer, bart).
