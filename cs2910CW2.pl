@@ -15,9 +15,6 @@ child_of(patty, jacqueline).
 child_of(selma, jacqueline).
 child_of(homer, abe).
 child_of(homer, mona).
-child_of(patty, jacqueline).
-child_of(selma, jacqueline).
-child_of(marge, jacqueline).
 
 male(abe).
 male(homer).
@@ -62,6 +59,14 @@ twin_of(X, Y) :- sibling_of(X, Y), age_is(X, Age), age_is(Y, Age).
 baby(X) :- age_is(X, Age), Age < 2.
 senior_citizen(X) :- age_is(X, Age), Age > 75.
 
+%% Find all parents using findall/3
+parents(Parents) :-
+    findall(X, child_of(_, X), AllParents),
+    list_to_set(AllParents, Parents).
+%% Find all parents using setof/3
+parents_set(ParentsSet) :-
+    setof(X, (child_of(_, X), (male(X); female(X))), ParentsSet).
+
 %% TEST: Run the following queries in SWI-Prolog to verify correctness:
 %% ?- father_of(homer, bart).
 %% ?- mother_of(marge, bart).
@@ -71,25 +76,5 @@ senior_citizen(X) :- age_is(X, Age), Age > 75.
 %% ?- twin_of(patty, selma).
 %% ?- baby(maggie).
 %% ?- senior_citizen(abe).
-
-%% 4.1 Finding a Path in a House
-
-connected(outside, porch1).
-connected(porch1, kitchen).
-connected(kitchen, living_room).
-connected(living_room, corridor).
-connected(corridor, wc).
-
-path(X, X, [X]).
-path(X, Y, [X|P]) :- connected(X, Z), path(Z, Y, P).
-
-%% TEST: Run the following queries in SWI-Prolog to verify correctness:
-%% ?- path(outside, wc, P).
-%% ?- path(kitchen, wc, P).
-
-%% 4.2 Bi-Directional Search to a Common Destination
-
-bi_path(O1, O2, D, P1, P2) :- path(O1, D, P1), path(O2, D, P2).
-
-%% TEST: Run the following queries in SWI-Prolog to verify correctness:
-%% ?- bi_path(outside, kitchen, wc, P1, P2).
+%% ?- parents(Parents).
+%% ?- parents_set(ParentsSet).
