@@ -20,3 +20,17 @@
 
 
   bi_path(outside, kitchen, wc, P1, P2).
+
+
+-----------------------------------
+
+% Find a path from outside to the WC
+% path(outside, wc, Path).
+
+% Find a path from bedroom_1 to the kitchen
+% path(bedroom_1, kitchen, Path).
+
+?- find_path(outside, wc, Path).
+?- all_paths(outside, wc, Paths).
+?- bidirectional_path(kitchen, bedroom1, wc, Path1, Path2).
+?- shortest_meeting_path(kitchen, bedroom1, wc, ShortestPath1, ShortestPath2).
