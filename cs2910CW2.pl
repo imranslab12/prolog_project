@@ -1,6 +1,3 @@
-%% CS2910 Assessed Coursework 2
-%% Optimized Prolog Implementation
-
 %% 3.1 Facts - Representing the Family Tree
 
 child_of(bart, homer).
@@ -61,7 +58,7 @@ parents(Parents) :-
 parents_set(ParentsSet) :-
     setof(X, Y^child_of(Y, X), ParentsSet).
 
-%% House Navigation System
+%% 4.1 House Navigation System
 
 connected(outside, porch1).
 connected(porch1, kitchen).
@@ -89,12 +86,12 @@ connected(bedroom2, corridor).
 path(A, B) :- connected(A, B).
 path(A, B) :- connected(B, A).
 
-% Reverse a list efficiently
+% Reverse a list 
 reverse_list(List, Reversed) :- reverse_acc(List, [], Reversed).
 reverse_acc([], Acc, Acc).
 reverse_acc([H|T], Acc, Reversed) :- reverse_acc(T, [H|Acc], Reversed).
 
-% Depth-first search for pathfinding with cycle avoidance
+% Depth-first search for pathfinding 
 find_path(O, D, Path) :-
     search(O, D, [O], RevPath),
     reverse_list(RevPath, Path).
@@ -116,7 +113,7 @@ find_path_safe(O, D, Path) :-
     ; write('Error: Invalid destination.'), nl, fail )
     ; write('Error: Invalid origin.'), nl, fail ).
 
-% Bi-directional path search
+% 4.2 Bi-directional path search
 bidirectional_path(O1, O2, D, Path1, Path2) :-
     find_path(O1, D, Path1),
     find_path(O2, D, Path2).
