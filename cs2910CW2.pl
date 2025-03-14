@@ -51,12 +51,16 @@ senior_citizen(X) :- age_is(X, Age), Age > 75.
 
 %% Find all parents using findall/3
 parents(Parents) :-
-    findall(X, child_of(_, X), AllParents),
-    list_to_set(AllParents, Parents).
+    findall(X, child_of(_, X), Parents).
 
 %% Find all parents using setof/3
 parents_set(ParentsSet) :-
     setof(X, Y^child_of(Y, X), ParentsSet).
+
+% The difference between findall and setof:
+% - findall collects all solutions including duplicates, my implementation
+% - requires set_prolog_flag(answer_write_options, [max_depth(100)]). to see full list.
+% - setof automatically removes duplicates and sorts the results alphabetically
 
 %% 4.1 House Navigation System
 
