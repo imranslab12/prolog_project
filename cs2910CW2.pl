@@ -43,12 +43,12 @@ age_is(maggie, 1).
 father_of(X, Y) :- male(X), child_of(Y, X), !.
 mother_of(X, Y) :- female(X), child_of(Y, X), !.
 sibling_of(X, Y) :- child_of(X, P), child_of(Y, P), X \= Y, !.
+grandfather_of(X, Y) :- male(X), child_of(Z, X), child_of(Y, Z).
+daughter_of(X, Y) :- female(X), child_of(X, Y).
 
 older_than(X, Y) :- age_is(X, AgeX), age_is(Y, AgeY), AgeX > AgeY.
 younger_than(X, Y) :- age_is(X, AgeX), age_is(Y, AgeY), AgeX < AgeY.
-
 twin_of(X, Y) :- sibling_of(X, Y), age_is(X, Age), age_is(Y, Age), !.
-
 baby(X) :- age_is(X, Age), Age < 2.
 senior_citizen(X) :- age_is(X, Age), Age > 75.
 
