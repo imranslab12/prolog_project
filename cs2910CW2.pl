@@ -39,12 +39,6 @@ age_is(bart, 10).
 age_is(lisa, 8).
 age_is(maggie, 1).
 
-%% TEST: Run the following queries in SWI-Prolog to verify correctness:
-%% ?- child_of(bart, homer).
-%% ?- male(homer).
-%% ?- female(marge).
-%% ?- age_is(abe, X).
-
 %% 3.2 Rules - Defining Relationships
 
 father_of(X, Y) :- male(X), child_of(Y, X).
@@ -61,26 +55,14 @@ senior_citizen(X) :- age_is(X, Age), Age > 75.
 
 %% Find all parents using findall/3
 parents(Parents) :-
-    findall(X, child_of(_, X), Parents).
-
+    findall(X, child_of(_, X), AllParents),
+    list_to_set(AllParents, Parents).
 
 %% Find all parents using setof/3
 parents_set(ParentsSet) :-
-    findall(X, child_of(_, X), AllParents),
-    list_to_set(AllParents, ParentsSet).
+    setof(X, Y^child_of(Y, X), ParentsSet).
 
-%% TEST: Run the following queries in SWI-Prolog to verify correctness:
-%% ?- father_of(homer, bart).
-%% ?- mother_of(marge, bart).
-%% ?- sibling_of(lisa, bart).
-%% ?- older_than(marge, homer).
-%% ?- younger_than(maggie, lisa).
-%% ?- twin_of(patty, selma).
-%% ?- baby(maggie).
-%% ?- senior_citizen(abe).
-%% ?- parents(Parents).
-%% ?- parents_set(ParentsSet).
-
+%% House Navigation System
 % Define the connections between locations
 connected(outside, porch1).
 connected(porch1, kitchen).
@@ -89,11 +71,21 @@ connected(porch2, living_room).
 connected(kitchen, living_room).
 connected(living_room, corridor).
 connected(corridor, wc).
-connected(living_room, bedroom1).
-connected(living_room, masterbedroom).
-connected(corridor, bedroom1).
-connected(corridor, masterbedroom).
 connected(corridor, bathroom).
+connected(corridor, bedroom1).
+connected(corridor, bedroom2). % Changed masterbedroom to bedroom2
+
+% Ensure bidirectional connections
+connected(porch1, outside).
+connected(kitchen, porch1).
+connected(porch2, outside).
+connected(living_room, porch2).
+connected(corridor, living_room).
+connected(wc, corridor).
+connected(bathroom, corridor).
+connected(bedroom1, corridor).
+connected(bedroom2, corridor).% Changed masterbedroom to bedroom2
+
 
 % Define bidirectional connections
 path(A, B) :- connected(A, B).
@@ -116,7 +108,7 @@ search(Current, Destination, Visited, Path) :-
 
 % Find all possible paths
 all_paths(O, D, Paths) :-
-    findall(P, (find_path(O, D, P)), Paths).
+    findall(P, find_path(O, D, P), Paths).
 
 % Error handling
 find_path_safe(O, D, Path) :-
