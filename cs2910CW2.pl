@@ -92,6 +92,16 @@ connected(bedroom2, corridor).% Changed masterbedroom to bedroom2
 path(A, B) :- connected(A, B).
 path(A, B) :- connected(B, A).
 
+% Base case: direct connection
+path(A, B) :- connected(A, B).
+
+% Recursive case: path through intermediate locations
+path(A, B) :- 
+    connected(A, C),
+    C \= B,  % Avoid redundant check
+    path(C, B),
+    \+ member(C, [A, B]).  % Prevent loops
+
 % Reverse a list
 reverse_list([], []).
 reverse_list([H|T], Rev) :- reverse_list(T, RevT), append(RevT, [H], Rev).
@@ -100,6 +110,7 @@ reverse_list([H|T], Rev) :- reverse_list(T, RevT), append(RevT, [H], Rev).
 find_path(O, D, Path) :-
     search(O, D, [O], RevPath),
     reverse_list(RevPath, Path).
+
 
 search(D, D, Path, Path). % If destination is reached
 search(Current, Destination, Visited, Path) :-
