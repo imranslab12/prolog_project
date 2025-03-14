@@ -79,6 +79,7 @@ connected(corridor, bedroom2). % Changed masterbedroom to bedroom2
 connected(porch1, outside).
 connected(kitchen, porch1).
 connected(porch2, outside).
+connected(living_room, kitchen).
 connected(living_room, porch2).
 connected(corridor, living_room).
 connected(wc, corridor).
