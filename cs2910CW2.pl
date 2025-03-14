@@ -100,7 +100,7 @@ path(A, B) :-
     connected(A, C),
     C \= B,  % Avoid redundant check
     path(C, B),
-    \+ member(C, [A, B]).  % Prevent loops
+    \+ member(C, [A, B]).  
 
 % Reverse a list
 reverse_list([], []).
