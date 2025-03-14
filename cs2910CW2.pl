@@ -1,6 +1,5 @@
 %% CS2910 Assessed Coursework 2
-%% This file contains the Prolog implementation for the coursework.
-%% Ensure to test each predicate in SWI-Prolog using the queries provided in the comments.
+%% Optimized Prolog Implementation
 
 %% 3.1 Facts - Representing the Family Tree
 
@@ -41,14 +40,14 @@ age_is(maggie, 1).
 
 %% 3.2 Rules - Defining Relationships
 
-father_of(X, Y) :- male(X), child_of(Y, X).
-mother_of(X, Y) :- female(X), child_of(Y, X).
-sibling_of(X, Y) :- child_of(X, P), child_of(Y, P), X \= Y.
+father_of(X, Y) :- male(X), child_of(Y, X), !.
+mother_of(X, Y) :- female(X), child_of(Y, X), !.
+sibling_of(X, Y) :- child_of(X, P), child_of(Y, P), X \= Y, !.
 
 older_than(X, Y) :- age_is(X, AgeX), age_is(Y, AgeY), AgeX > AgeY.
 younger_than(X, Y) :- age_is(X, AgeX), age_is(Y, AgeY), AgeX < AgeY.
 
-twin_of(X, Y) :- sibling_of(X, Y), age_is(X, Age), age_is(Y, Age).
+twin_of(X, Y) :- sibling_of(X, Y), age_is(X, Age), age_is(Y, Age), !.
 
 baby(X) :- age_is(X, Age), Age < 2.
 senior_citizen(X) :- age_is(X, Age), Age > 75.
@@ -63,7 +62,7 @@ parents_set(ParentsSet) :-
     setof(X, Y^child_of(Y, X), ParentsSet).
 
 %% House Navigation System
-% Define the connections between locations
+
 connected(outside, porch1).
 connected(porch1, kitchen).
 connected(outside, porch2).
@@ -73,9 +72,8 @@ connected(living_room, corridor).
 connected(corridor, wc).
 connected(corridor, bathroom).
 connected(corridor, bedroom1).
-connected(corridor, bedroom2). % Changed masterbedroom to bedroom2
+connected(corridor, bedroom2).
 
-% Ensure bidirectional connections
 connected(porch1, outside).
 connected(kitchen, porch1).
 connected(porch2, outside).
@@ -85,34 +83,23 @@ connected(corridor, living_room).
 connected(wc, corridor).
 connected(bathroom, corridor).
 connected(bedroom1, corridor).
-connected(bedroom2, corridor).% Changed masterbedroom to bedroom2
+connected(bedroom2, corridor).
 
-
-% Define bidirectional connections
+% Define bidirectional paths
 path(A, B) :- connected(A, B).
 path(A, B) :- connected(B, A).
 
-% Base case: direct connection
-path(A, B) :- connected(A, B).
+% Reverse a list efficiently
+reverse_list(List, Reversed) :- reverse_acc(List, [], Reversed).
+reverse_acc([], Acc, Acc).
+reverse_acc([H|T], Acc, Reversed) :- reverse_acc(T, [H|Acc], Reversed).
 
-% Recursive case: path through intermediate locations
-path(A, B) :- 
-    connected(A, C),
-    C \= B,  % Avoid redundant check
-    path(C, B),
-    \+ member(C, [A, B]).  
-
-% Reverse a list
-reverse_list([], []).
-reverse_list([H|T], Rev) :- reverse_list(T, RevT), append(RevT, [H], Rev).
-
-% Depth-first search for pathfinding
+% Depth-first search for pathfinding with cycle avoidance
 find_path(O, D, Path) :-
     search(O, D, [O], RevPath),
     reverse_list(RevPath, Path).
 
-
-search(D, D, Path, Path). % If destination is reached
+search(D, D, Path, Path).
 search(Current, Destination, Visited, Path) :-
     path(Current, Next),
     \+ member(Next, Visited), % Avoid loops
@@ -124,9 +111,10 @@ all_paths(O, D, Paths) :-
 
 % Error handling
 find_path_safe(O, D, Path) :-
-    ( path(O, _) -> ( path(D, _) -> find_path(O, D, Path)
-    ; write('Error: Invalid destination.'), fail )
-    ; write('Error: Invalid origin.'), fail ).
+    ( path(O, _) -> 
+    ( path(D, _) -> find_path(O, D, Path)
+    ; write('Error: Invalid destination.'), nl, fail )
+    ; write('Error: Invalid origin.'), nl, fail ).
 
 % Bi-directional path search
 bidirectional_path(O1, O2, D, Path1, Path2) :-
@@ -136,4 +124,5 @@ bidirectional_path(O1, O2, D, Path1, Path2) :-
 % Find shortest paths to common destination
 shortest_meeting_path(O1, O2, D, ShortestPath1, ShortestPath2) :-
     findall((P1, P2), bidirectional_path(O1, O2, D, P1, P2), Paths),
-    min_member((ShortestPath1, ShortestPath2), Paths).
+    sort(2, @=<, Paths, Sorted),
+    nth0(0, Sorted, (ShortestPath1, ShortestPath2)).
